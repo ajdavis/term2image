@@ -1,12 +1,10 @@
 from setuptools import setup, find_packages
-from codecs import open
 from os import path
 
 here = path.abspath(path.dirname(__file__))
 
-# Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
+long_description = (
+    'Read the output of a terminal command like "man" or "ls" and write a PNG.')
 
 term2image_license = 'GNU Lesser General Public License v3 (LGPLv3)'
 
