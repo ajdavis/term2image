@@ -23,7 +23,7 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Topic :: Utilities',
-        term2image_license,
+        'License :: OSI Approved :: ' + term2image_license,
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
     ],
