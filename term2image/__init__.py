@@ -21,9 +21,9 @@ _COLORS = {
 }
 
 
-def main(opts):
-    buf = opts.infile.read()
-    opts.infile.close()
+def term2image(infile, outfile):
+    buf = infile.read()
+    infile.close()
 
     cols = 120
     font_size = 16
@@ -60,10 +60,13 @@ def main(opts):
             draw.text((col * font_width + margin_left, row * font_height),
                       c, fill, font)
 
-    img.save(opts.outfile)
+    img.save(outfile)
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Receive term")
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Convert terminal command output to an image")
+
     parser.add_argument('-i', '--infile', type=argparse.FileType('r'),
                         default='-', required=False)
     parser.add_argument('-o', '--outfile', type=argparse.FileType('wb'))
@@ -80,5 +83,11 @@ if __name__ == '__main__':
 
         path, _ = os.path.splitext(opts.infile.name)
         opts.outfile = '%s.png' % path
+    else:
+        _, ext = os.path.splitext(opts.outfile.name)
+        if not ext:
+            parser.error(
+                'bad outfile "%s", it must have an extension like ".png"' % (
+                    opts.outfile.name))
 
-    main(opts)
+    term2image(opts.infile, opts.outfile)
