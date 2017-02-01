@@ -7,7 +7,7 @@ from PIL import ImageFont
 from PIL import ImageDraw
 
 # Our vendored TermEmulator from https://github.com/sivachandran/TermEmulator
-import TermEmulator as te
+from . import TermEmulator as te
 
 _COLORS = {
     1: (0, 0, 0),
@@ -27,7 +27,7 @@ def term2image(infile, outfile):
 
     cols = 120
     font_size = 16
-    rows = buf.count(b'\n')
+    rows = buf.count('\n')
     term = te.V102Terminal(rows=rows, cols=cols)
     term.ProcessInput(buf)
     screen = term.GetRawScreen()
@@ -58,7 +58,7 @@ def term2image(infile, outfile):
                 fill = 'red'
 
             draw.text((col * font_width + margin_left, row * font_height),
-                      c, fill, font)
+                      chr(c), fill, font)
 
     img.save(outfile)
 
