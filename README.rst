@@ -2,6 +2,18 @@
 term2image
 ==========
 
+Install
+=======
+
+Compatible with Python 2.7 and Python 3.
+
+.. code-block:: none
+
+  python -m pip install term2image
+
+Usage
+=====
+
 Read the output of a terminal command like "man" or "ls" and write a PNG.
 
 .. code-block:: none
