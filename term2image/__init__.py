@@ -1,7 +1,12 @@
 import argparse
+import os
 import sys
-from array import array
 
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw
+
+# Our vendored TermEmulator from https://github.com/sivachandran/TermEmulator
 import TermEmulator as te
 
 _COLORS = {
@@ -16,44 +21,64 @@ _COLORS = {
 }
 
 
-def find_end(screen):
-    width = len(screen[0])
-    blank = array('c', ' ' * width)
-
-    for row, line in reversed(list(enumerate(screen))):
-        if line != blank:
-            return row
-
-
 def main(opts):
     buf = opts.infile.read()
     opts.infile.close()
 
     cols = 120
-    rows = 10000
+    font_size = 16
+    rows = buf.count(b'\n')
     term = te.V102Terminal(rows=rows, cols=cols)
-
     term.ProcessInput(buf)
     screen = term.GetRawScreen()
-    last_row = find_end(screen)
+
+    regular = ImageFont.truetype("Courier New.ttf", font_size)
+    font_width, font_height = regular.getsize('E')
+    margin_left = font_width
+
+    bold = ImageFont.truetype("Courier New Bold.ttf", font_size)
+
+    # No, I don't know why we need this adjustment.
+    img = Image.new('RGB',
+                    (int(cols * font_width * 0.7), rows * font_height),
+                    'white')
+
+    draw = ImageDraw.Draw(img)
+
     for row, line in enumerate(screen):
         for col, c in enumerate(line):
+            font = regular
+            fill = 'black'
+
             style, fgcolor, bgcolor = term.GetRendition(row, col)
             if style & term.RENDITION_STYLE_BOLD:
-                pass
+                font = bold
 
             if style & term.RENDITION_STYLE_UNDERLINE:
-                pass
+                fill = 'red'
 
-            sys.stdout.write(c)
+            draw.text((col * font_width + margin_left, row * font_height),
+                      c, fill, font)
 
-        sys.stdout.write('\n')
-        if row == last_row:
-            break
-
+    img.save(opts.outfile)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Receive term")
-    parser.add_argument('-i', '--infile', type=argparse.FileType('r'), default='-')
-    opts = parser.parse_args()
+    parser.add_argument('-i', '--infile', type=argparse.FileType('r'),
+                        default='-', required=False)
+    parser.add_argument('-o', '--outfile', type=argparse.FileType('wb'))
+    opts, args = parser.parse_known_args()
+    if len(args) > 1 or args and opts.infile is not sys.stdin:
+        parser.error("too many arguments")
+
+    if args:
+        opts.infile = open(args[0], 'r')
+
+    if not opts.outfile:
+        if opts.infile is sys.stdin:
+            parser.error("--outfile is required when reading from stdin")
+
+        path, _ = os.path.splitext(opts.infile.name)
+        opts.outfile = '%s.png' % path
+
     main(opts)
