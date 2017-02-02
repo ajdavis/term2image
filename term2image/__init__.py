@@ -51,8 +51,8 @@ def term2image(infile, outfile):
     term.ProcessInput(buf)
     screen = term.GetRawScreen()
 
-    regular = get_font(fonts.NotCourierSans, font_size)
-    bold = get_font(fonts.NotCourierSansBold, font_size)
+    regular = get_font(fonts.SourceCode, font_size)
+    bold = get_font(fonts.SourceCodeBold, font_size)
 
     font_width, font_height = regular.getsize('E')
     margin_left = font_width
