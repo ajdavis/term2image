@@ -1,15 +1,12 @@
 import argparse
+import io
 import os
-import pkgutil
 import sys
-from io import BytesIO
 
-from PIL import Image
-from PIL import ImageFont
-from PIL import ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
-# Our vendored TermEmulator from https://github.com/sivachandran/TermEmulator
 from . import TermEmulator as te
+from . import fonts
 
 _COLORS = {
     1: (0, 0, 0),
@@ -23,9 +20,8 @@ _COLORS = {
 }
 
 
-def get_font(font_name, font_size):
-    buf = BytesIO(pkgutil.get_data('term2image', 'fonts/' + font_name))
-    return ImageFont.FreeTypeFont(buf, font_size)
+def get_font(font_data, font_size):
+    return ImageFont.FreeTypeFont(io.BytesIO(font_data), font_size)
 
 
 def term2image(infile, outfile):
@@ -39,8 +35,8 @@ def term2image(infile, outfile):
     term.ProcessInput(buf)
     screen = term.GetRawScreen()
 
-    regular = get_font("NotCourierSans.ttf", font_size)
-    bold = get_font("NotCourierSans-Bold.ttf", font_size)
+    regular = get_font(fonts.NotCourierSans, font_size)
+    bold = get_font(fonts.NotCourierSansBold, font_size)
 
     font_width, font_height = regular.getsize('E')
     margin_left = font_width
