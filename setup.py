@@ -12,7 +12,7 @@ term2image_license = 'GNU Lesser General Public License v3 (LGPLv3)'
 
 setup(
     name='term2image',
-    version='0.4-dev0',
+    version='0.5',
     description='Convert terminal command output to an image',
     long_description=long_description,
     url='https://github.com/ajdavis/term2image',
