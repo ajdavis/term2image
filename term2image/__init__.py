@@ -3,10 +3,9 @@ import io
 import os
 import sys
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFont
 
-from . import TermEmulator as te
-from . import fonts
+from . import TermEmulator as te, fonts
 
 _COLORS = {
     1: (0, 0, 0),
@@ -24,13 +23,30 @@ def get_font(font_data, font_size):
     return ImageFont.FreeTypeFont(io.BytesIO(font_data), font_size)
 
 
+def trim(im, border):
+    bg = Image.new(im.mode, im.size, border)
+    diff = ImageChops.difference(im, bg)
+    bbox = diff.getbbox()
+    if bbox:
+        x, y, x2, y2 = bbox
+        margin = 10
+        new = Image.new(im.mode,
+                        (x2 - x + 2 * margin, y2 - y + 2 * margin),
+                        border)
+
+        new.paste(im, (margin - x, margin - y))
+        return new
+
+    return im
+
+
 def term2image(infile, outfile):
     buf = infile.read()
     infile.close()
 
-    cols = 120
+    cols = 100
     font_size = 16
-    rows = buf.count('\n')
+    rows = buf.count('\n') + 200
     term = te.V102Terminal(rows=rows, cols=cols)
     term.ProcessInput(buf)
     screen = term.GetRawScreen()
@@ -40,10 +56,8 @@ def term2image(infile, outfile):
 
     font_width, font_height = regular.getsize('E')
     margin_left = font_width
-
-    # No, I don't know why we need this adjustment.
     img = Image.new('RGB',
-                    (int(cols * font_width * 0.7), rows * font_height),
+                    (int(cols * font_width), rows * font_height),
                     'white')
 
     draw = ImageDraw.Draw(img)
@@ -63,7 +77,7 @@ def term2image(infile, outfile):
             draw.text((col * font_width + margin_left, row * font_height),
                       chr(c), fill, font)
 
-    img.save(outfile)
+    trim(img, 'white').save(outfile)
 
 
 def main():
