@@ -18,7 +18,7 @@ def font_data():
 
 setup(
     name='term2image',
-    version='0.2-dev0',
+    version='0.3',
     description='Convert terminal command output to an image',
     long_description=long_description,
     url='https://github.com/ajdavis/term2image',
