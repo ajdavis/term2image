@@ -41,7 +41,7 @@ def trim(im, border):
 
 
 def term2image(infile, outfile):
-    buf = infile.read()
+    buf = infile.read().decode('utf-8')
     infile.close()
 
     cols = 100
@@ -75,7 +75,7 @@ def term2image(infile, outfile):
                 fill = 'red'
 
             draw.text((col * font_width + margin_left, row * font_height),
-                      chr(c), fill, font)
+                      c, fill, font)
 
     trim(img, 'white').save(outfile)
 

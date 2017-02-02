@@ -169,11 +169,11 @@ class V102Terminal:
         self.isLineDirty = []
         
         for i in range(rows):
-            line = array('b')
+            line = array('u')
             rendition = array('L')
 
             for j in range(cols):
-                line.append(ord(' '))
+                line.append(u' ')
                 rendition.append(0)
             
             self.screen.append(line)
@@ -477,11 +477,8 @@ class V102Terminal:
             if ascii in self.charHandlers.keys():
                 index, style = self.charHandlers[ascii](text, index)
             else:
-                if ch in self.printableChars:
-                    self.__PushChar(ch, style)
-                    style = 0
-                else:
-                    print("WARNING: Unsupported character %s:%d" % (ch, ascii))
+                self.__PushChar(ch, style)
+                style = 0
                 index += 1
         
         # update the dirty lines
@@ -543,7 +540,7 @@ class V102Terminal:
         if self.curX >= self.cols:
             self.__NewLine()
             
-        self.screen[self.curY][self.curX] = ord(ch)
+        self.screen[self.curY][self.curX] = ch
         self.scrRendition[self.curY][self.curX] |= self.curRendition | style
         self.curX += 1
         
