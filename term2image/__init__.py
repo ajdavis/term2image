@@ -1,6 +1,8 @@
 import argparse
 import os
+import pkgutil
 import sys
+from io import BytesIO
 
 from PIL import Image
 from PIL import ImageFont
@@ -21,6 +23,11 @@ _COLORS = {
 }
 
 
+def get_font(font_name, font_size):
+    buf = BytesIO(pkgutil.get_data('term2image', 'fonts/' + font_name))
+    return ImageFont.FreeTypeFont(buf, font_size)
+
+
 def term2image(infile, outfile):
     buf = infile.read()
     infile.close()
@@ -32,11 +39,11 @@ def term2image(infile, outfile):
     term.ProcessInput(buf)
     screen = term.GetRawScreen()
 
-    regular = ImageFont.truetype("Courier New.ttf", font_size)
+    regular = get_font("NotCourierSans.ttf", font_size)
+    bold = get_font("NotCourierSans-Bold.ttf", font_size)
+
     font_width, font_height = regular.getsize('E')
     margin_left = font_width
-
-    bold = ImageFont.truetype("Courier New Bold.ttf", font_size)
 
     # No, I don't know why we need this adjustment.
     img = Image.new('RGB',

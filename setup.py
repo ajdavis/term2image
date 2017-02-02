@@ -1,3 +1,5 @@
+import glob
+
 from setuptools import setup, find_packages
 from os import path
 
@@ -7,6 +9,12 @@ long_description = (
     'Read the output of a terminal command like "man" or "ls" and write a PNG.')
 
 term2image_license = 'GNU Lesser General Public License v3 (LGPLv3)'
+
+
+def font_data():
+    for file_path in glob.glob('term2image/fonts/*'):
+        yield file_path[len('term2image/'):]
+
 
 setup(
     name='term2image',
@@ -28,6 +36,10 @@ setup(
 
     keywords='terminal image',
     packages=find_packages(),
+    package_data={
+        'term2image': list(font_data()),
+    },
+    include_package_data=True,
     install_requires=['pillow'],
     entry_points={
         'console_scripts': [
