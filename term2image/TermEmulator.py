@@ -542,6 +542,10 @@ class V102Terminal:
             
         self.screen[self.curY][self.curX] = ch
         self.scrRendition[self.curY][self.curX] |= self.curRendition | style
+        # HACK to deal with bad data somewhere earlier in the pipeline, unsure.
+        if ch == u'_':
+            # underline off
+            self.scrRendition[self.curY][self.curX] &= 0xfffffff7
         self.curX += 1
         
         self.isLineDirty[self.curY] = True
@@ -874,6 +878,9 @@ class V102Terminal:
                 elif irendition >= 40 and irendition <= 47:
                     # background
                     self.curRendition |= ((irendition - 39) << 12) & 0x0000f000
+                elif irendition == 24:
+                    # underline off
+                    self.curRendition &= 0xfffffff7
                 elif irendition == 27:
                     # reverse video off
                     self.curRendition &= 0xffffffbf
