@@ -171,7 +171,7 @@ class V102Terminal:
         for i in range(rows):
             line = array('b')
             rendition = array('L')
-            
+
             for j in range(cols):
                 line.append(ord(' '))
                 rendition.append(0)
@@ -636,10 +636,10 @@ class V102Terminal:
         if (0 < index < len(text)
                 and text[index - 1] in self.printableChars
                 and text[index + 1] in self.printableChars):
-            if text[index - 1] == '_':
-                style = self.RENDITION_STYLE_UNDERLINE
-            elif text[index - 1] == text[index + 1]:
+            if text[index - 1] == text[index + 1]:
                 style = self.RENDITION_STYLE_BOLD
+            elif text[index - 1] == '_':
+                style = self.RENDITION_STYLE_UNDERLINE
 
         return index + 1, style
     
