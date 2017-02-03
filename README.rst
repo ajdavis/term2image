@@ -27,6 +27,8 @@ Read the output of a terminal command like "man" or "ls" and write a PNG.
     -i INFILE, --infile INFILE
     -o OUTFILE, --outfile OUTFILE
 
+If no input file is given, term2image reads from stdin.
+
 Example
 =======
 
