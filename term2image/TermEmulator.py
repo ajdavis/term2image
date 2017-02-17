@@ -30,6 +30,7 @@ CUP, ED, EL, VPA and SGR.
 
 from __future__ import print_function
 
+import copy
 import sys
 import os
 import pty
@@ -167,17 +168,15 @@ class V102Terminal:
         
         # list of dirty lines since last call to GetDirtyLines
         self.isLineDirty = []
-        
-        for i in range(rows):
-            line = array('u')
-            rendition = array('L')
 
-            for j in range(cols):
-                line.append(u' ')
-                rendition.append(0)
-            
-            self.screen.append(line)
-            self.scrRendition.append(rendition)
+        empty_line = array('u')
+        empty_line.fromlist(list(u' ' * cols))
+        empty_rend = array('L')
+        empty_rend.fromlist([0] * cols)
+
+        for i in range(rows):
+            self.screen.append(copy.copy(empty_line))
+            self.scrRendition.append(copy.copy(empty_rend))
             self.isLineDirty.append(False)
         
         # initializes callbacks    

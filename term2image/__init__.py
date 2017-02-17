@@ -1,4 +1,5 @@
 import argparse
+import copy
 import io
 import os
 import sys
@@ -40,6 +41,39 @@ def trim(im, border):
     return im
 
 
+def glyphs(screen, term, regular, bold):
+    # row, col, char, font, fill.
+    old_rend = [regular, 'black']
+    new_rend = old_rend[:]
+    buf = u''
+    buf_col = 0
+
+    for row, line in enumerate(screen):
+        for col, c in enumerate(line):
+            new_rend = [regular, 'black']
+
+            style, fgcolor, bgcolor = term.GetRendition(row, col)
+            if style & term.RENDITION_STYLE_BOLD:
+                new_rend[0] = bold
+
+            if style & term.RENDITION_STYLE_UNDERLINE:
+                new_rend[1] = 'red'
+
+            if new_rend == old_rend:
+                buf += c
+            else:
+                if buf:
+                    yield row, buf_col, buf, old_rend
+                buf = c
+                buf_col = col
+                old_rend = new_rend
+
+        if buf:
+            yield row, buf_col, buf, old_rend
+            buf = u''
+            buf_col = 0
+
+
 def term2image(infile, outfile):
     buf = infile.read().decode('utf-8')
     infile.close()
@@ -61,21 +95,9 @@ def term2image(infile, outfile):
                     'white')
 
     draw = ImageDraw.Draw(img)
-
-    for row, line in enumerate(screen):
-        for col, c in enumerate(line):
-            font = regular
-            fill = 'black'
-
-            style, fgcolor, bgcolor = term.GetRendition(row, col)
-            if style & term.RENDITION_STYLE_BOLD:
-                font = bold
-
-            if style & term.RENDITION_STYLE_UNDERLINE:
-                fill = 'red'
-
-            draw.text((col * font_width + margin_left, row * font_height),
-                      c, fill, font)
+    for row, col, c, (font, fill) in glyphs(screen, term, regular, bold):
+        draw.text((col * font_width + margin_left, row * font_height),
+                  c, fill, font)
 
     trim(img, 'white').save(outfile)
 
