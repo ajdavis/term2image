@@ -2,6 +2,8 @@
 term2image
 ==========
 
+This package is **unmaintained**. It's easier to use `aha <https://github.com/theZiz/aha>`_ to generate HTML from terminal output and process the HTML into your desired final format.
+
 Install
 =======
 
